@@ -1,7 +1,11 @@
 import Link from "next/link";
 import { Suspense } from "react";
 import { Metadata } from "next";
-import { fetchUserRecord, fetchUserPosts } from "./../../../../lib/users";
+import {
+  getAllUsers,
+  fetchUserRecord,
+  fetchUserPosts,
+} from "./../../../../lib/users";
 import { UserPosts, User } from "./components";
 
 type UserParams = {
@@ -10,12 +14,14 @@ type UserParams = {
   };
 };
 
+const revalidate = 60;
+
 const generateMetadata = async ({
   params: { userId },
 }: UserParams): Promise<Metadata> => {
   const userPromise: Promise<User> = fetchUserRecord(userId);
   const user = await userPromise;
-  const { name, email } = user;
+  const { name } = user;
 
   return {
     title: `${name}`,
@@ -45,4 +51,20 @@ const UserPage = async ({ params: { userId } }: UserParams) => {
   );
 };
 
-export { UserPage as default, generateMetadata };
+const generateStaticParams = async () => {
+  const usersPromise: Promise<User[]> = getAllUsers();
+  const users = await usersPromise;
+
+  return users.map((id) => {
+    {
+      userId: id.toString();
+    }
+  });
+};
+
+export {
+  UserPage as default,
+  generateMetadata,
+  revalidate,
+  generateStaticParams,
+};

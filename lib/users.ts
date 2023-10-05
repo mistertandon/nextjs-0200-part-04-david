@@ -6,9 +6,16 @@ const getAllUsers = async () => {
   return result.json();
 };
 
+/**
+ * Available options for cache configurations are
+ * "default" | "force-cache" | "no-cache" | "no-store" | "only-if-cached" | "reload";
+ * {cache: 'force-cache'}
+ * {cache: 'no-store'}
+ */
 const fetchUserRecord = async (userId: string) => {
   const result = await fetch(
-    `https://jsonplaceholder.typicode.com/users/${userId}`
+    `https://jsonplaceholder.typicode.com/users/${userId}`,
+    { cache: "force-cache" }
   );
 
   if (!result.ok) throw new Error("Failed to fetch Userdata");
